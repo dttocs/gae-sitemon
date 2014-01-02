@@ -81,8 +81,8 @@ def sendmail(status, url, log_file = ''):
               to = query.get().alert_email,
               subject = 'Server status change notification',
               body = mail_body,
-	      attachments=[('log.txt', log_file)])
-	return
+              attachments=[('log.txt', log_file)])
+        return
       else:
         mail_body = 'web site (%s) down\nstatus: %s' % (url, status)
       mail.send_mail(sender = query.get().admin_email,
@@ -126,9 +126,9 @@ class TaskHandler(webapp.RequestHandler):
       newstatus = result.status_code #preliminary result, now check if content is correct (checkvalue)
       if result.status_code == 200:
         if len(cronUrlDB.checkvalue) != 0:
-	  if not re.search(cronUrlDB.checkvalue, result.content, re.I):	    
-	    newstatus = -3 # bad content
-	    content = result.content
+          if not re.search(cronUrlDB.checkvalue, result.content, re.I):            
+            newstatus = -3 # bad content
+            content = result.content
     except urlfetch.InvalidURLError:
       self.response.out.write('Exception: Not an URL')
       newstatus = -2 # bad url
@@ -159,7 +159,7 @@ def process_remote_test(self, cronUrlDB, timeref, newstatus, content):
       if cronUrlDB.status == 200:
         cronUrlDB.n_errors = 0
       else:
-	cronUrlDB.n_errors = 1
+        cronUrlDB.n_errors = 1
       cronUrlDB.acc_delay = delay_ms
       cronUrlDB.min_delay = delay_ms
       cronUrlDB.max_delay = delay_ms
@@ -188,7 +188,7 @@ def process_remote_test(self, cronUrlDB, timeref, newstatus, content):
       if cronUrlDB.status == 200:
         cronUrlDB.n_errors = 0
       else:
-	cronUrlDB.n_errors = 1
+        cronUrlDB.n_errors = 1
       cronUrlDB.acc_delay = delay_ms
       cronUrlDB.min_delay = delay_ms
       cronUrlDB.max_delay = delay_ms
@@ -197,7 +197,7 @@ def process_remote_test(self, cronUrlDB, timeref, newstatus, content):
     else:      
       cronUrlDB.counter = cronUrlDB.counter + 1
       if cronUrlDB.status != 200:
-	cronUrlDB.n_errors = cronUrlDB.n_errors + 1
+        cronUrlDB.n_errors = cronUrlDB.n_errors + 1
       cronUrlDB.acc_delay = delay_ms + cronUrlDB.acc_delay
       if cronUrlDB.min_delay > delay_ms:
         cronUrlDB.min_delay = delay_ms
@@ -231,7 +231,7 @@ class ClearHandler(webapp.RequestHandler):
             min_delay = statDB.min_delay
           if max_delay < statDB.max_delay:
             max_delay = statDB.max_delay
-	  statDB.delete()
+          statDB.delete()
         dailyDB = DailyDB3()
         dailyDB.mean_delay = acc_delay / n_items
         dailyDB.min_delay = min_delay
@@ -275,8 +275,8 @@ class ViewHandler(webapp.RequestHandler):
         'ns': ns,
         'names': names,
         'dailyDBs': dailyDBs,
-	'latency': latency,
-	'errors': errors,
+        'latency': latency,
+        'errors': errors,
       }
     elif self.request.get('action') == 'month':
       dailyDBs = db.GqlQuery("SELECT * FROM DailyDB3 ORDER BY date DESC LIMIT 30")
@@ -294,8 +294,8 @@ class ViewHandler(webapp.RequestHandler):
         'ns': ns,
         'names': names,
         'dailyDBs': dailyDBs,
-	'latency': latency,
-	'errors': errors,
+        'latency': latency,
+        'errors': errors,
       }
     else:   
       statDBs = db.GqlQuery("SELECT * FROM StatDB3 ORDER BY date DESC LIMIT 12")
@@ -313,8 +313,8 @@ class ViewHandler(webapp.RequestHandler):
         'ns': ns,
         'names': names,
         'statDBs': statDBs,
-	'latency': latency,
-	'errors': errors,
+        'latency': latency,
+        'errors': errors,
       }
     printHtml(self, 'view.html', template_values)
 
@@ -332,16 +332,16 @@ def dashboard(self):
         for statDB in query:
           n_errors += statDB.n_errors
           n_retrys += statDB.n_retrys
-	if n_errors > 4:
-	  image = 'level3.png'
-	elif n_errors > 1:
-	  image = 'level2.png'
-	elif n_retrys > 0:
-	  image = 'level1.png'
-	else:
-	  image = 'level0.png'
+        if n_errors > 4:
+          image = 'level3.png'
+        elif n_errors > 1:
+          image = 'level2.png'
+        elif n_retrys > 0:
+          image = 'level1.png'
+        else:
+          image = 'level0.png'
       else:
-	image = 'level.png'
+        image = 'level.png'
       status.append((cronUrlDB, image))
 
     namespace_manager.set_namespace('') # remove namespace
@@ -375,7 +375,7 @@ class AdminHandler(webapp.RequestHandler):
         urlDB = UrlDB()
         urlDB.url = self.request.get('url').strip()
         urlDB.put()
-	result = 'url added'
+        result = 'url added'
       else:
         result = 'url must start with http://'
     if action == 'addcronurl2':
@@ -383,7 +383,7 @@ class AdminHandler(webapp.RequestHandler):
         cronUrlDB = CronUrlDB3()
         cronUrlDB.url = self.request.get('url').strip()
         cronUrlDB.alias = self.request.get('alias').strip()
-	if len(cronUrlDB.alias) == 0: 
+        if len(cronUrlDB.alias) == 0: 
           cronUrlDB.alias = cronUrlDB.url
         cronUrlDB.checkvalue = self.request.get('checkvalue').strip()
         cronUrlDB.counter = 0 # just defined!
@@ -393,24 +393,24 @@ class AdminHandler(webapp.RequestHandler):
         cronUrlDB.put()
         result = 'cron url added'
       else:
-	result = 'url must start with http://'
+        result = 'url must start with http://'
     if action == 'edit.email':
       if self.request.get('admin.email').find('@') != -1:
         if self.request.get('alert.email').find('@') != -1:
           query = ConfigDB.all()
           if query.get() == None: # singleton
             configDB = ConfigDB()
-	  else:
+          else:
             configDB = query.get()
           configDB.admin_email = self.request.get('admin.email')
           configDB.alert_email = self.request.get('alert.email')
-	  configDB.send_mail = (self.request.get('send.email') == 'True')
+          configDB.send_mail = (self.request.get('send.email') == 'True')
           configDB.put()
           result = 'email values saved in configuration'
         else:
           result = 'alert email must contain @'
       else:
-	result = 'admin email must contain @'
+        result = 'admin email must contain @'
     render_admin(self, action, result, None)
 
   def get(self):
@@ -425,9 +425,9 @@ class AdminHandler(webapp.RequestHandler):
       entity = db.get(mykey)
       if entity:
         entity.delete()
-	result = 'entity deleted'
+        result = 'entity deleted'
       else:
-	result = 'nothing to delete'
+        result = 'nothing to delete'
     render_admin(self, action, result, mykey)
 
 # render_admin
@@ -471,13 +471,13 @@ def footer(self):
 
 app = webapp.WSGIApplication([('/', MainHandler), 
                                         ('/view', ViewHandler), 
-					('/cron', CronHandler), 
-					('/clear', ClearHandler), 
-					('/exectask', TaskHandler), 
-					('/checkurl', CheckurlHandler), 
-					('/admin', AdminHandler), 
-					('/_ah/xmpp/message/chat/', XmppHandler),
-				       ], debug=True)
+                                        ('/cron', CronHandler), 
+                                        ('/clear', ClearHandler), 
+                                        ('/exectask', TaskHandler), 
+                                        ('/checkurl', CheckurlHandler), 
+                                        ('/admin', AdminHandler), 
+                                        ('/_ah/xmpp/message/chat/', XmppHandler),
+                                       ], debug=True)
 
 #
 #  main()
