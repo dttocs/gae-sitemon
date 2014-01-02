@@ -1,6 +1,6 @@
 # http://code.google.com/appengine/docs/python/config/appconfig.html
 
-application: cron-tab-hrd
+application: scdsitemon
 version: 4
 runtime: python27
 api_version: 1
@@ -41,4 +41,4 @@ inbound_services:
 - xmpp_message
 
 builtins:
-- datastore_admin: on
+# - datastore_admin: on
