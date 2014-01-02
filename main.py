@@ -69,17 +69,24 @@ def sendmail(status, url, log_file = ''):
     if query.get().send_mail:
       if status == -1:
         mail_body = 'web site (%s) down!' % url
+        mail_sub  = '%s down' % url
       elif status == 0:
         mail_body = 'web site (%s) status undefined' % url
+        mail_sub  = '%s undefined' % url
       elif status == 200:
         mail_body = 'web site (%s) up and running!' % url
+        mail_sub  = '%s up' % url
       elif status == -2:
         mail_body = 'bad url (%s) provided for the cron-tab feature' % url
+        mail_sub  = '%s bad url' % url
       elif status == -3:
         mail_body = 'unexpected content from %s, fails checkvalue' % url
+        mail_sub  = '%s fail' % url
+        
+        logging.info('Sending email: body %s', mail_body)
         mail.send_mail(sender = query.get().admin_email,
               to = query.get().alert_email,
-              subject = 'Server status change notification',
+              subject = 'Server status change notification: %s' % mail_sub,
               body = mail_body,
               attachments=[('log.txt', log_file)])
         return
@@ -89,7 +96,8 @@ def sendmail(status, url, log_file = ''):
               to = query.get().alert_email,
               subject = 'Server status change notification',
               body = mail_body)
-
+      logging.info('Sending email: body %s', mail_body)
+      
 #printHtml
 def printHtml(self, template_name, template_values={}):
   path = os.path.join(os.path.dirname(__file__), os.path.join('templates', template_name))
@@ -136,7 +144,7 @@ class TaskHandler(webapp.RequestHandler):
     except urlfetch.DownloadError:
       self.response.out.write('Exception: Download error')
       newstatus = -1 # download error
-#    logging.info('retry: %s', self.request.get('retry'))
+    logging.info('retry: %s', self.request.get('retry'))
     if int(self.request.get('retry')) > 0:
       process_remote_test(self, cronUrlDB, timeref, newstatus, content)
       return
@@ -205,6 +213,7 @@ def process_remote_test(self, cronUrlDB, timeref, newstatus, content):
         cronUrlDB.max_delay = delay_ms
       cronUrlDB.put()
     if sendmail_flag:
+      logging.warn("sending mail?")
       sendmail(cronUrlDB.status, cronUrlDB.url, content)
 
 # ClearHandler
@@ -483,6 +492,8 @@ app = webapp.WSGIApplication([('/', MainHandler),
 #  main()
 #
 def main():
+    logging.getLogger().setLevel(logging.DEBUG)
+    logging.warn("Starting server")
     run_wsgi_app(app)
 
 if __name__ == '__main__':
