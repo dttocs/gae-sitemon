@@ -1,0 +1,67 @@
+<html>
+<head><title>Dashboard</title>
+{{ style|safe }}
+<script type="text/javascript">//<![CDATA[
+function update() {
+  {% for urlDB in urlDBs %}
+	callRemote({{ forloop.counter0 }}, 'checkurl', 'url={{ urlDB.key }}', '{{ urlDB.key }}');
+  {% endfor %}
+}
+
+var xmlHttpObject = Array();
+
+function callRemote(i, url, params, element_id) {
+	xmlHttpObject[i] = false;
+	if (window.XMLHttpRequest) { // Mozilla, Safari,...
+	   xmlHttpObject[i] = new XMLHttpRequest();
+	} else if (window.ActiveXObject) { // IE
+	   try {
+		  xmlHttpObject[i] = new ActiveXObject("Msxml2.XMLHTTP");
+	   } catch (e) {
+		  try {
+			 xmlHttpObject[i] = new ActiveXObject("Microsoft.XMLHTTP");
+		  } catch (e) {}
+	   }
+	}
+	if (xmlHttpObject[i]) {
+		if (params)
+			url += "?"+params;
+
+		xmlHttpObject[i].onreadystatechange=function () {
+			stateChanged(i, element_id);
+		};
+		xmlHttpObject[i].open('GET', url, true);
+		xmlHttpObject[i].send(null);
+	}
+}
+
+function stateChanged(k, element_id) {
+	if (xmlHttpObject[k].readyState == 4) {
+		if (xmlHttpObject[k].status == 200)
+			document.getElementById(element_id).innerHTML = xmlHttpObject[k].responseText;
+	}
+}
+
+//]]>
+</script>
+</head>
+<body onLoad='update()'>
+  {{ header|safe }}
+<br>
+<table>
+  {% for cronurl, image in status %}
+  <tr><td><a href="view?ns={{ cronurl.key }}">{{ cronurl.alias }}</a></td><td><img src="images/{{ image }}" width="64" height="64" border="0"></td></tr>
+  {% endfor %}
+</table>
+<br>
+{% if urlDBs.count > 0 %}
+<table>
+  {% for urlDB in urlDBs %}
+  <tr><td>{{ urlDB.url }}</td><td id='{{ urlDB.key }}'></td></tr>
+  {% endfor %}
+</table>
+{% endif %}
+	{{ footer|safe }}
+
+</body>
+</html>

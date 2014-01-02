@@ -1,0 +1,7 @@
+============================================================
+!     cron-tab, version 3.0 (author: javal6, 09-2011)      !
+============================================================
+in case of update from release 2.x to release 3.x:
+1) (optional) go to the (http://appengine.google.com/), select the data viewer and delete any CronUrlDB and DailyDB entity
+2) unpack all files included in cron-tab.zip into a specific local directory, e.g 'myapp'
+3) upload all files from 'myapp' to google application engine server: appcfg.py update myapp

@@ -1,0 +1,93 @@
+<html>
+<head><title>Admin</title>
+{{ style|safe }}
+</head>
+<body>
+	{{ header|safe }}
+
+	{% if result %}
+   	Result: {{ result }}<br><br>
+    {% endif %}
+
+    {% ifequal action 'addurl' %}
+	<form action='/admin' method='post'>
+	enter url: <input type='text' name='url' size='40' value='http://'>
+	<input name='action' type='hidden' value='addurl2'>
+	<input type='submit' name='submit' value='Add'>
+	</form>
+    {% endifequal %}
+
+    {% ifequal action 'delete' %}
+     <form action='admin' method='get'>
+	 <input name='key' type='hidden' value='{{ mykey }}'>
+	 <input name='action' type='hidden' value='delete2'>
+	 <input type='submit' name='submit' value='Confirm delete'>
+	 </form>
+    {% endifequal %}
+
+    {% ifequal action 'addcronurl' %}
+	<form action='/admin' method='post'>
+	enter cron url: <input type='text' name='url' size='40' value='http://'>
+	enter alias: <input type='text' name='alias' size='40' value=''>
+	enter check value (if any): <input type='text' name='checkvalue' size='40' value=''>
+	<input name='action' type='hidden' value='addcronurl2'>
+	<input type='submit' name='submit' value='Add'>
+	</form>
+    {% endifequal %}
+
+  {% if not action %}
+	<br>
+	<table>
+	  <tr><th>Alias</th><th>Cron Url</th><th>Status</th><th>Check Value</th><th>Action</th></tr>
+      {% for cronUrlDB in cronUrlDBs %}
+	  <tr>
+		<td>{{ cronUrlDB.alias }}</td><td>{{ cronUrlDB.url }}</td><td>{{ cronUrlDB.status }}</td><td>{{ cronUrlDB.checkvalue }}</td><td><a href="admin?action=delete&key={{ cronUrlDB.key }}">delete</a></td>
+	  </tr>
+	  {% endfor %}
+	  <tr>
+		<td colspan='5'><a href="admin?action=addcronurl">add cron url</a></td>
+	  </tr>
+	</table>
+
+    {% if urlDBs.count > 0 %}
+	<br>
+	{{ urlDBs.count }} items in urlDBs
+	<table>
+	  <tr><th>Url</th><th>Action</th></tr>
+      {% for urlDB in urlDBs %}
+	  <tr>
+		<td>{{ urlDB.url }}</td><td><a href="admin?action=delete&key={{ urlDB.key }}">delete</a></td>
+	  </tr>
+	  {% endfor %}
+	  <tr>
+		<td colspan='2'><a href="admin?action=addurl">add new url</a></td>
+	  </tr>
+	</table>
+	{% endif %}
+
+	<br>
+	<form action='/admin' method='post'>
+	<table>
+    <tr>
+	<td>enter e-mail of the administrator: </td><td><input type='text' name='admin.email' size='40' value='{{ admin_email }}'></td>
+    </tr>
+    <tr>
+	<td>enter e-mail to receive alerts: </td><td><input type='text' name='alert.email' size='40' value='{{ alert_email }}'></td>
+    </tr>
+    <tr><td>send alert mail: 
+	{% if send_mail %}
+	<input type="checkbox" name="send.email" value="True" checked="checked">
+    {% else %}
+	<input type="checkbox" name="send.email" value="True">
+    {% endif %}
+	</td><td>
+	<input name='action' type='hidden' value='edit.email'>
+	<input type='submit' name='submit' value='Save'></td>
+    <tr>
+	</table>
+	</form>
+  {% endif %}
+
+	{{ footer|safe }}
+</body>
+</html>

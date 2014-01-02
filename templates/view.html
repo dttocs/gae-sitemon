@@ -1,0 +1,61 @@
+<html>
+<head><title>View</title>
+{{ style|safe }}
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+  google.load('visualization', '1', {packages:['imagesparkline']});
+</script>
+</head>
+<body>
+    {{ header|safe }}
+	<br><table>
+	  <tr><th>Cron Url</th><th>View</th></tr>
+      {% for cronurl in names %}
+	  <tr><td><a href="view?ns={{ cronurl.key }}">{{ cronurl.alias }}</a></td><td><a href="view?ns={{ cronurl.key }}">Today</a> | <a href="view?action=week&ns={{ cronurl.key }}">Week</a> | <a href="view?action=month&ns={{ cronurl.key }}">30 days</a></td></tr>
+	  {% endfor %}
+	</table>
+	<br><br>
+	<script type="text/javascript">
+	  google.setOnLoadCallback(function() {
+		var data = [['latency','006699', {{latency}}],['errors','ff0000', {{errors}}]];
+
+		for(i=0; i < data.length; ++i) {
+		  var key = data[i][0], color = data[i][1], values = data[i][2];
+		  if(values.length > 0) {
+			  var gData = new google.visualization.DataTable();
+			  gData.addColumn("number", data[i][0]);
+			  gData.addRows(values.length);
+			  for(j=0; j < values.length; ++j) gData.setValue(j,0,values[j]);
+			  chart = new google.visualization.ImageSparkLine(document.getElementById('chart_id_'+key));
+			  chart.draw(gData, {color: data[i][1], width:200, height:40, showAxisLines:true,  showValueLabels:false, labelPosition:'right'});
+		  }
+		}
+	  }
+	  );
+	</script>
+	<div id="chart_id_latency"></div><div id="chart_id_errors"></div>
+    {% if statDBs %}
+	{{ statDBs.count }} items in statDBs
+	<table>
+	  <tr><th>Time</th><th> </th><th>Min delay (ms)</th><th>Mean delay (ms)</th><th>Max delay (ms)</th><th># Errors</th></tr>
+      {% for statDB in statDBs %}
+	  <tr>
+		<td>{{ statDB.date }}</td><td> </td><td>{{ statDB.min_delay }}</td><td>{{ statDB.mean_delay }}</td><td>{{ statDB.max_delay }}</td>	<td>{{ statDB.n_errors }}</td>
+	  </tr>
+	  {% endfor %}
+	</table>
+    {% endif %}
+    {% if dailyDBs %}
+	{{ dailyDBs.count }} items in dailyDBs
+	<table>
+	  <tr><th>Time</th><th> </th><th>Min delay (ms)</th><th>Mean delay (ms)</th><th>Max delay (ms)</th><th># Errors</th></tr>
+      {% for dailyDB in dailyDBs %}
+	  <tr>
+		<td>{{ dailyDB.date }}</td><td> </td><td>{{ dailyDB.min_delay }}</td><td>{{ dailyDB.mean_delay }}</td><td>{{ dailyDB.max_delay }}</td>	<td>{{ dailyDB.n_errors }}</td>
+	  </tr>
+	  {% endfor %}
+	</table>
+    {% endif %}
+		{{ footer|safe }}
+</body>
+</html>
