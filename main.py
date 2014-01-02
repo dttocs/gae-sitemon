@@ -164,7 +164,7 @@ def process_remote_test(self, cronUrlDB, timeref, newstatus, content):
       cronUrlDB.min_delay = delay_ms
       cronUrlDB.max_delay = delay_ms
       cronUrlDB.put()
-    elif cronUrlDB.counter > 11:
+    elif cronUrlDB.counter >= 5:  # update statsDB every 10 minutes
       no_date = cronUrlDB.date
       no_mean_delay = cronUrlDB.acc_delay / cronUrlDB.counter
       no_min_delay = cronUrlDB.min_delay
