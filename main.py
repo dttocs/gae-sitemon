@@ -307,7 +307,7 @@ class ViewHandler(webapp.RequestHandler):
         'errors': errors,
       }
     else:   
-      statDBs = db.GqlQuery("SELECT * FROM StatDB3 ORDER BY date DESC LIMIT 12")
+      statDBs = db.GqlQuery("SELECT * FROM StatDB3 ORDER BY date DESC LIMIT 144")
       latency = []
       errors = []
       for statDB in statDBs:
